@@ -26,7 +26,13 @@ jobs:
           arduino-cli lib install "PubSubClient"
           arduino-cli lib install "Adafruit GFX Library"
           arduino-cli lib install "Adafruit ILI9341"
-
+    - name: List all files in repository
+        run: |
+          pwd
+          ls -la
+          echo "=== Find all .ino files ==="
+          find . -name "*.ino" -type f
+          
       - name: Compile
         run: |
           arduino-cli compile --fqbn esp32:esp32:esp32 ./esp32-project.ino --output-dir ./build_output
