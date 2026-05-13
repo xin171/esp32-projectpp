@@ -1,30 +1,37 @@
-name: Build ESP32 Firmware
-
+name: Build ESP32 (Arduino)
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - uses: actions/checkout@v4
 
-      - name: Build with ESP-IDF
-        uses: espressif/esp-idf-ci-action@v1
-        with:
-          esp_idf_version: v5.1.2
-          target: esp32
-          path: '.'
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
 
-      - name: Upload firmware
+      - name: Install ESP32 core
+        run: |
+          arduino-cli config add board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32
+
+      - name: Install libraries
+        run: |
+          arduino-cli lib install "WiFi"
+          arduino-cli lib install "PubSubClient"
+          arduino-cli lib install "Adafruit GFX Library"
+          arduino-cli lib install "Adafruit ILI9341"
+
+      - name: Build firmware
+        run: |
+          arduino-cli compile --fqbn esp32:esp32:esp32 ./main
+
+      - name: Upload bin
         uses: actions/upload-artifact@v4
         with:
-          name: esp32-firmware
-          path: |
-            build/*.bin
-            build/bootloader/*.bin
-            build/partition_table/*.bin
+          name: esp32-firmware-bin
+          path: ./main/build/*.bin
