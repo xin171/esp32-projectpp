@@ -29,10 +29,11 @@ jobs:
 
       - name: Compile
         run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32 .
+          # 假设你的主文件是 esp32-project.ino 放在根目录
+          arduino-cli compile --fqbn esp32:esp32:esp32 . --output-dir ./build_output
 
       - name: Upload BIN
         uses: actions/upload-artifact@v4
         with:
           name: esp32-firmware
-          path: ./*.bin
+          path: ./build_output/*.bin
