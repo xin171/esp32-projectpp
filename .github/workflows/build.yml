@@ -26,7 +26,7 @@ jobs:
           arduino-cli lib install "PubSubClient"
           arduino-cli lib install "Adafruit GFX Library"
           arduino-cli lib install "Adafruit ILI9341"
-    - name: List all files in repository
+      - name: List all files in repository
         run: |
           pwd
           ls -la
