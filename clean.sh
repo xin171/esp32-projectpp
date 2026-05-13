@@ -1,1 +1,2 @@
-clean.sh
+#!/bin/bash
+idf.py fullclean
