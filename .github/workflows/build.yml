@@ -3,8 +3,8 @@ name: Build ESP32 Bin
 on:
   push:
     branches:
-      - '**'   # 所有分支都触发
-  workflow_dispatch:  # 允许手动触发
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Arduino CLI
+      - name: Setup Arduino CLI
         uses: arduino/setup-arduino-cli@v2
 
       - name: Install ESP32 Core
@@ -27,12 +27,12 @@ jobs:
           arduino-cli lib install "Adafruit GFX Library"
           arduino-cli lib install "Adafruit ILI9341"
 
-      - name: Build firmware
+      - name: Compile
         run: |
           arduino-cli compile --fqbn esp32:esp32:esp32 .
 
       - name: Upload BIN
         uses: actions/upload-artifact@v4
         with:
-          name: firmware
+          name: esp32-firmware
           path: ./*.bin
