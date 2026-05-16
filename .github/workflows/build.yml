@@ -2,25 +2,27 @@ name: Download ESP32 Toolchain for Windows
 
 on:
   workflow_dispatch:  # 手动触发
-  push:               # 也可以设置自动触发
 
 jobs:
   download-toolchain:
-    runs-on: ubuntu-latest  # 下载用 ubuntu 就行，不需要 windows
+    runs-on: ubuntu-latest
     steps:
-      - name: Download Windows version of toolchain
+      - name: Download Windows version of toolchain (tar.xz)
         run: |
-          # 下载 Windows 版本的 zip 包
-          TOOLCHAIN_URL="https://github.com/espressif/toolchain-xtensa-esp32/releases/download/8.4.0%2B2021r2-patch5/xtensa-esp32-elf-gcc8_4_0-esp-2021r2-patch5-win64.zip"
-          wget "$TOOLCHAIN_URL" -O xtensa-esp32-elf-win64.zip
+          # 正确的 Windows 版本下载链接
+          TOOLCHAIN_URL="https://github.com/espressif/toolchain-xtensa-esp32/releases/download/8.4.0%2B2021r2-patch5/xtensa-esp32-elf-gcc8_4_0-esp-2021r2-patch5-win64.tar.xz"
+          wget "$TOOLCHAIN_URL" -O xtensa-esp32-elf-win64.tar.xz
           
-          # 可选：解压后重新打包
-          unzip xtensa-esp32-elf-win64.zip -d toolchain
+          # 解压 tar.xz
+          tar -xf xtensa-esp32-elf-win64.tar.xz
+          
+          # 查看解压后的目录结构
+          ls -la
           
       - name: Upload as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: xtensa-esp32-toolchain-win64
           path: |
-            xtensa-esp32-elf-win64.zip
-            toolchain/  # 如果解压了，也上传解压后的文件夹
+            xtensa-esp32-elf-win64.tar.xz
+            xtensa-esp32-elf/  # 解压后的文件夹
