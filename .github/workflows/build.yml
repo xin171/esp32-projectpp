@@ -1,44 +1,26 @@
-name: Build ESP32 Bin
+name: Download ESP32 Toolchain for Windows
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_dispatch:  # 手动触发
+  push:               # 也可以设置自动触发
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  download-toolchain:
+    runs-on: ubuntu-latest  # 下载用 ubuntu 就行，不需要 windows
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Arduino CLI
-        uses: arduino/setup-arduino-cli@v2
-
-      - name: Install ESP32 Core
+      - name: Download Windows version of toolchain
         run: |
-          arduino-cli config add board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
-          arduino-cli core update-index
-          arduino-cli core install esp32:esp32
-
-      - name: Install Libraries
-        run: |
-          arduino-cli lib install "PubSubClient"
-          arduino-cli lib install "Adafruit GFX Library"
-          arduino-cli lib install "Adafruit ILI9341"
-      - name: List all files in repository
-        run: |
-          pwd
-          ls -la
-          echo "=== Find all .ino files ==="
-          find . -name "*.ino" -type f
+          # 下载 Windows 版本的 zip 包
+          TOOLCHAIN_URL="https://github.com/espressif/toolchain-xtensa-esp32/releases/download/8.4.0%2B2021r2-patch5/xtensa-esp32-elf-gcc8_4_0-esp-2021r2-patch5-win64.zip"
+          wget "$TOOLCHAIN_URL" -O xtensa-esp32-elf-win64.zip
           
-      - name: Compile
-        run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32 ./esp32-project.ino --output-dir ./build_output
-
-      - name: Upload BIN
+          # 可选：解压后重新打包
+          unzip xtensa-esp32-elf-win64.zip -d toolchain
+          
+      - name: Upload as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: esp32-firmware
-          path: ./build_output/*.bin
+          name: xtensa-esp32-toolchain-win64
+          path: |
+            xtensa-esp32-elf-win64.zip
+            toolchain/  # 如果解压了，也上传解压后的文件夹
